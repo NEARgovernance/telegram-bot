@@ -37,58 +37,70 @@ function startWebSocket() {
 
   ws.on('open', () => {
     console.log('WebSocket connected');
-    ws.send(JSON.stringify({
-    "And": [
+
+    const filter = {
+      "And": [
         {
-        "path": "event_standard",
-        "operator": {
-            "Equals": "venear"
-        }
+          "path": "event_standard",
+          "operator": { "Equals": "venear" }
         },
         {
-        "path": "event_event",
-        "operator": {
-            "Equals": "proposal_approve"
+          "path": "account_id",
+          "operator": { "Equals": VOTING_CONTRACT }
         }
-        },
-        {
-        "path": "account_id",
-        "operator": {
-            "Equals": VOTING_CONTRACT
-        }
-        }
-    ]
-    }));
+      ]
+    };
+
+    ws.send(JSON.stringify(filter));
   });
 
-ws.on('message', async (data) => {
-  const text = data.toString();
-  if (!text.startsWith('{') && !text.startsWith('[')) {
-    console.error('WS RAW (not JSON):', text);
-    return;
-  }
-
-  try {
-    const events = JSON.parse(text);
-    console.log('WS parsed:', events);
-
-    for (const event of events) {
-      const proposalId = event.data?.[0]?.proposal_id;
-      if (proposalId === undefined) continue;
-
-      const status = await getStatus(proposalId);
-      if (status === 'Approved') continue;
-
-      console.log(`Detected approval for proposal ID: ${proposalId}`);
-      const proposal = await fetchProposal(proposalId);
-      const title = proposal?.title || `Proposal #${proposalId}`;
-      await sendMessage(`🗳️ *Proposal Approved:*\n${title}`);
-      await setStatus(proposalId, 'Approved');
+  ws.on('message', async (data) => {
+    const text = data.toString();
+    if (!text.startsWith('{') && !text.startsWith('[')) {
+      console.error('WS RAW (not JSON):', text);
+      return;
     }
-  } catch (err) {
-    console.error('WS message error:', err.message);
-  }
-});
+
+    try {
+      const events = JSON.parse(text);
+      console.log('WS parsed:', events);
+
+        for (const event of events) {
+        console.log('Full event object:', JSON.stringify(event, null, 2));
+
+        const proposalId = event.event_data?.[0]?.proposal_id || event.data?.[0]?.proposal_id;
+        const eventType = event.event_event;
+
+        console.log('proposalId:', proposalId, 'eventType:', eventType);
+
+        if (proposalId === undefined || !eventType) {
+            console.log('Skipping event - missing proposalId or eventType');
+            continue;
+        }
+
+        if (eventType === 'proposal_approve') {
+          const status = await getStatus(proposalId);
+          if (status === 'Approved') continue;
+
+          console.log(`Detected approval for proposal ID: ${proposalId}`);
+          const proposal = await fetchProposal(proposalId);
+          const title = proposal?.title || `Proposal #${proposalId}`;
+          await sendMessage(`🗳️ *Proposal Approved:*\n*${title}*`);
+          await setStatus(proposalId, 'Approved');
+        }
+
+        if (eventType === 'create_proposal') {
+        console.log(`Detected new proposal: ${proposalId}`);
+        const proposal = await fetchProposal(proposalId);
+        const title = proposal?.title || `Proposal #${proposalId}`;
+
+        await sendMessage(`📥 Proposal Created:\n${title}`);
+        }
+      }
+    } catch (err) {
+      console.error('WS message error:', err.message);
+    }
+  });
 
   ws.on('close', () => {
     console.log('WebSocket closed. Reconnecting...');
@@ -105,6 +117,7 @@ startWebSocket();
 export async function runTest() {
   const dummyId = 5;
   const proposal = await fetchProposal(dummyId);
-  await sendMessage(`*Proposal Approved for Voting:*\n${proposal?.title || 'No title'}`);
+  const title = proposal?.title || 'No title';
+  await sendMessage(`🗳️ Proposal Approved:\n${title}`);
   await setStatus(dummyId, 'Approved');
 }

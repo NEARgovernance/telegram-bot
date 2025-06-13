@@ -11,17 +11,25 @@ export async function sendMessage(text, chatId = CHAT_ID) {
   const body = {
     chat_id: chatId,
     text,
-    parse_mode: 'Markdown',
+    // parse_mode: 'Markdown',
   };
 
   try {
+    console.log('Attempting to send message:', text);
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
+
+    const result = await res.json();
+    console.log('Telegram API response:', result);
+
     if (!res.ok) {
       console.error(`Failed to send Telegram message: ${res.statusText}`);
+      console.error('Response body:', result);
+    } else {
+      console.log('Message sent successfully');
     }
   } catch (err) {
     console.error('Telegram error:', err.message);
