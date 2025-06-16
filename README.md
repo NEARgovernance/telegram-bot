@@ -93,15 +93,15 @@ Flexible helpers check multiple fields in the payload to accommodate variations 
 ## Environment Variables
 | Variable             | Required | Description                                                            | Default |
 | -------------------- | -------- | ---------------------------------------------------------------------- | ------- |
-| `VOTING_CONTRACT`    | ✅ Yes   | NEAR account ID of the governance contract (e.g., `vote.your.testnet`) | - |
-| `TELEGRAM_BOT_TOKEN` | ✅ Yes   | Telegram Bot API token from @BotFather                                 | - |
-| `MONGO_URI`          | ✅ Yes   | MongoDB connection URI                                                 | - |
-| `WEBHOOK_URL`        | ✅ Yes   | Public HTTPS URL for Telegram webhook (e.g., `https://your-domain.com`) | - |
-| `WEBHOOK_SECRET`     | ⚪ Optional | Secret token for securing webhook requests                             | - |
-| `NEAR_RPC_URL`       | ⚪ Optional | NEAR RPC endpoint                                                      | `https://rpc.testnet.near.org` |
-| `PORT`               | ⚪ Optional | Port for HTTP server                                                   | `3000` |
-| `MONGO_DB`           | ⚪ Optional | MongoDB database name                                                  | `govbot` |
-| `MONGO_COLLECTION`   | ⚪ Optional | Collection for tracking proposals | `seen_proposals` |
+| `VOTING_CONTRACT`    | ✳️ Yes   | NEAR account ID of the governance contract (e.g., `vote.your.testnet`) | - |
+| `TELEGRAM_BOT_TOKEN` | ✳️ Yes   | Telegram Bot API token from @BotFather                                 | - |
+| `MONGO_URI`          | ✳️ Yes   | MongoDB connection URI                                                 | - |
+| `WEBHOOK_URL`        | ✳️ Yes   | Public HTTPS URL for Telegram webhook (e.g., `https://your-domain.com`) | - |
+| `WEBHOOK_SECRET`     | Optional | Secret token for securing webhook requests                             | - |
+| `NEAR_RPC_URL`       | Optional | NEAR RPC endpoint                                                      | `https://rpc.testnet.near.org` |
+| `PORT`               | Optional | Port for HTTP server                                                   | `3000` |
+| `MONGO_DB`           | Optional | MongoDB database name                                                  | `govbot` |
+| `MONGO_COLLECTION`   | Optional | Collection for tracking proposals | `seen_proposals` |
 
 ## License
 This project is licensed under the MIT License.
