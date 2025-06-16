@@ -38,15 +38,14 @@ A Telegram bot that delivers real-time notifications about NEAR governance propo
 3. Copy `.env.example` to `.env` and fill in the values:
 
 ```env
-TELEGRAM_BOT_TOKEN=<your_bot_token>
-MONGO_URI=<your_mongodb_uri>
-MONGO_DB=govbot
-MONGO_COLLECTION=seen_proposals
-VOTING_CONTRACT=<your.near_contract>
-NEAR_RPC_URL=https://rpc.testnet.near.org
-WEBHOOK_URL=https://your-app.com
-WEBHOOK_SECRET=<random_secret>
-PORT=3000
+# Required
+VOTING_CONTRACT=vote.hos03.testnet
+TELEGRAM_BOT_TOKEN=your_bot_token
+MONGO_URI=mongodb://localhost:27017
+WEBHOOK_URL=https://your-domain.com
+
+# Optional
+WEBHOOK_SECRET=your_webhook_secret
 ```
 
 ## Usage
