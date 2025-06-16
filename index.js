@@ -17,7 +17,7 @@ const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 import http from 'http';
 import fetch from 'node-fetch';
 import WebSocket from 'ws';
-import { handleTelegramUpdate, sendMessageToAllChats, setupWebhook } from './telegram.js';
+import { handleTelegramUpdate, sendMessageToAllChats, setupWebhook, escapeHtml } from './telegram.js';
 import { getStatus, setStatus, closeMongo, addChat, removeChat, getAllChats, updateChatActivity } from './mongo.js';
 // import { EventStreamClient } from '@intear/inevents-websocket-client';
 
@@ -312,7 +312,7 @@ async function handleNewProposal(proposalId, eventDetails) {
       snapshotText = `\n📊 <b>Voting Power:</b> ${totalVotingPower} veNEAR`;
     }
 
-    const message = `📥 <b>New Proposal</b>\n\n<b>${title}</b>\n\n${description}${deadlineText}${snapshotText}${linkText}`;
+    const message = `📥 <b>New Proposal</b>\n\n<b>${escapeHtml(title)}</b>\n\n${escapeHtml(description)}${deadlineText}${snapshotText}${linkText}`;
 
     const sentCount = await sendMessageToAllChats(message);
     await setStatus(proposalId, 'Seen');
@@ -359,7 +359,7 @@ async function handleProposalApproval(proposalId, eventDetails) {
                     `   Total Power: ${totalVotingPower} veNEAR`;
     }
 
-    const message = `🗳️ <b>Proposal Approved for Voting</b>\n\n<b>${title}</b>\n\n${description}${snapshotText}${linkText}`;
+    const message = `🗳️ <b>Proposal Approved for Voting</b>\n\n<b>${escapeHtml(title)}</b>\n\n${escapeHtml(description)}${snapshotText}${linkText}`;
 
     const sentCount = await sendMessageToAllChats(message);
     await setStatus(proposalId, 'Approved');

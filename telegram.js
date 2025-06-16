@@ -7,6 +7,16 @@ dotenv.config();
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
+function escapeHtml(text) {
+  if (!text) return '';
+  return text.toString()
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 async function isUserAdmin(chatId, userId) {
   try {
     const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getChatMember`, {
@@ -450,7 +460,7 @@ async function handleProposalQuery(chatId, proposalId) {
         const numberEmojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
         emoji = numberEmojis[index] || '🔘';
 
-        optionsSection += `   ${emoji} ${option}: ${percentage}% (${votes} votes)\n`;
+        optionsSection += `   ${emoji} ${escapeHtml(option)}: ${percentage}% (${votes} votes)\n`;
     });
     }
 
@@ -463,10 +473,10 @@ async function handleProposalQuery(chatId, proposalId) {
     if (proposal.proposer_id || proposal.reviewer_id) {
       participantsSection = `\n👥 <b>Participants:</b>\n`;
       if (proposal.proposer_id) {
-        participantsSection += `   📝 Proposer: ${proposal.proposer_id}\n`;
+        participantsSection += `   📝 Proposer: ${escapeHtml(proposal.proposer_id)}\n`;
       }
       if (proposal.reviewer_id) {
-        participantsSection += `   👀 Reviewer: ${proposal.reviewer_id}\n`;
+        participantsSection += `   👀 Reviewer: ${escapeHtml(proposal.reviewer_id)}\n`;
       }
     }
 
@@ -478,14 +488,14 @@ async function handleProposalQuery(chatId, proposalId) {
     }
 
     const message = `📋 <b>Proposal #${proposalId} Details</b>\n\n` +
-                    `<b>${proposal.title || 'Untitled Proposal'}</b>\n\n` +
-                    `${proposal.description || 'No description provided.'}\n` +
+                    `<b>${escapeHtml(proposal.title) || 'Untitled Proposal'}</b>\n\n` +
+                    `${escapeHtml(proposal.description) || 'No description provided.'}\n` +
                     `${creationInfo}` +
                     `${participantsSection}` +
                     `${deadlineSection}` +
                     `${snapshotSection}` +
                     `${votingResultsSection}` +
-                    (proposal.link ? `\n🔗 <a href="${proposal.link}">View Full Details</a>` : '');
+                    (proposal.link ? `\n🔗 <a href="${escapeHtml(proposal.link)}">View Full Details</a>` : '');
 
         const MAX_MESSAGE_LENGTH = 4096;
         const truncatedMessage = message.length > MAX_MESSAGE_LENGTH
@@ -534,7 +544,7 @@ async function handleRecentProposals(chatId, count = 5) {
     };
 
     for (const proposal of proposals) {
-      const title = proposal.title || `Proposal #${proposal.id}`;
+      const title = escapeHtml(proposal.title) || `Proposal #${proposal.id}`;
       const status = proposal.status || 'Unknown';
       const statusDisplay = getStatusDisplay(status);
 
@@ -677,7 +687,7 @@ async function handleRecentActiveProposals(chatId, count = 5) {
 
     for (const p of proposals) {
       // Header
-      const title = p.title || `Proposal #${p.id}`;
+      const title = escapeHtml(p.title) || `Proposal #${p.id}`;
       message += `Proposal ID: ${p.id}\n`;
       message += `<b>${title}</b>\n`;
 
@@ -710,7 +720,7 @@ async function handleRecentActiveProposals(chatId, count = 5) {
           const pct   = totalVotes>0
             ? ((votes/totalVotes)*100).toFixed(1)
             : '0.0';
-          message += `     • ${opt}: ${pct}% (${votes} vote${votes===1?'':'s'})\n`;
+          message += `     • ${escapeHtml(opt)}: ${pct}% (${votes} vote${votes===1?'':'s'})\n`;
         });
       } else {
         message += `   📊 No voting options available\n`;
@@ -836,3 +846,5 @@ export async function setupWebhook() {
     throw error;
   }
 }
+
+export { escapeHtml };
