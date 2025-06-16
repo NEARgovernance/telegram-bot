@@ -2,13 +2,13 @@
   "name": "govbot",
   "version": "0.0.1",
   "main": "index.js",
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
   "dependencies": {
+    "@intear/inevents-websocket-client": "^1.0.0",
     "dotenv": "^16.5.0",
     "mongodb": "^6.17.0",
     "node-fetch": "^3.3.2",
-    "node-telegram-bot-api": "^0.66.0",
     "ws": "^8.18.2"
   },
   "devDependencies": {
