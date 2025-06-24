@@ -3,6 +3,9 @@ primary_region = "ewr"
 
 [build]
 
+[env]
+  NODE_ENV = "production"
+
 [http_service]
   force_https = true
   internal_port = 3000
